@@ -1,0 +1,18 @@
+diff --git a/src/i2c_bus.erl b/src/i2c_bus.erl
+index fc36621..c64de18 100644
+--- a/src/i2c_bus.erl
++++ b/src/i2c_bus.erl
+@@ -137,9 +137,10 @@ read_bytes(Bus, Address, Register, Count) ->
+ 
+ %% @hidden
+ init(Options) ->
+-    I2C = i2c:open([
+-        {clock_speed_hz, maps:get(freq_hz, Options)}
+-        | maps:to_list(Options)
++    I2C = i2c:open_nif([
++        {sda, maps:get(sda, Options)},
++        {scl, maps:get(scl, Options)},
++        {clock_speed_hz, maps:get(freq_hz, Options, 400000)}
+     ]),
+     ?TRACE("I2C opened. Options: ~p I2C: ~p", [Options, I2C]),
+     State = #state{
