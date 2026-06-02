@@ -10,7 +10,8 @@
 -export([start/0, start/2, stop/1]).
 
 start() ->
-    atomtest_sup:start_link().
+    atomtest_sup:start_link(),
+    receive after infinity -> ok end.
 
 start(_StartType, _StartArgs) ->
     atomtest_sup:start_link().

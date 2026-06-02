@@ -32,14 +32,16 @@ init([]) ->
         intensity => 0,
         period => 1
     },
-    ChildSpecs = [#{
-            id => mytest,
-            start => {mytest, start_link, []},
-            restart => permanent,
-            shutdown => 2000,
-            type => worker,
-            modules => [mytest]
-        }],
+    ChildSpecs = [
+        #{id => bme280_server,
+          start => {bme280_server, start_link, []},
+          restart => permanent, shutdown => 2000,
+          type => worker, modules => [bme280_server]},
+        #{id => sensor_client,
+          start => {sensor_client, start_link, []},
+          restart => permanent, shutdown => 2000,
+          type => worker, modules => [sensor_client]}
+    ],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

@@ -60,6 +60,7 @@ init([]) ->
         {ok, Ref} ->
             io:format("BME280 found at 0x77~n"),
             take_reading(Ref),
+            erlang:send_after(5000, self(), read),
             {ok, #state{bme280=Ref}};
         {error, Reason} ->
             io:format("BME280 failed: ~p~n", [Reason]),
@@ -69,7 +70,7 @@ init([]) ->
 take_reading(Ref) ->
     case bme280:take_reading(Ref) of
         {ok, {Temp, Pressure, Humidity}} ->
-            io:format("Temp: ~p C, Pressure: ~p hPa, Humidity: ~p%~n",
+            io:format("Temp: ~.2f C, Pressure: ~.2f hPa, Humidity: ~.2f%~n",
                       [Temp, Pressure, Humidity]);
         {error, Reason} ->
             io:format("Read failed: ~p~n", [Reason])
@@ -119,6 +120,10 @@ handle_cast(_Request, State) ->
           {noreply, NewState :: term(), Timeout :: timeout()} |
           {noreply, NewState :: term(), hibernate} |
           {stop, Reason :: normal | term(), NewState :: term()}.
+handle_info(read, State) ->
+    take_reading(State#state.bme280),
+    erlang:send_after(5000, self(), read),
+    {noreply, State};
 handle_info(_Info, State) ->
     {noreply, State}.
 
